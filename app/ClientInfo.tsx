@@ -2,6 +2,12 @@
 
 import { useState, useEffect } from 'react';
 
+// 定义一个接口来描述 NetworkInformation 类型
+interface NetworkInformation extends EventTarget {
+  effectiveType: string;
+  // 可以添加其他属性，如果需要的话
+}
+
 export default function ClientInfo() {
   const [info, setInfo] = useState({
     screenWidth: 0,
@@ -26,7 +32,9 @@ export default function ClientInfo() {
         screenWidth: window.screen.width,
         screenHeight: window.screen.height,
         orientation: window.screen.orientation ? window.screen.orientation.type : '未知',
-        connection: 'connection' in navigator && navigator.connection ? navigator.connection.effectiveType : '未知',
+        connection: 'connection' in navigator 
+          ? (navigator.connection as NetworkInformation).effectiveType || '未知'
+          : '未知',
         cookieEnabled: navigator.cookieEnabled,
         userAgent: navigator.userAgent,
         language: navigator.language,
@@ -36,7 +44,7 @@ export default function ClientInfo() {
         pixelRatio: window.devicePixelRatio,
         maxTouchPoints: navigator.maxTouchPoints || 0,
         hardwareConcurrency: navigator.hardwareConcurrency || 0,
-        deviceMemory: 'deviceMemory' in navigator ? navigator.deviceMemory : 0,
+        deviceMemory: 'deviceMemory' in navigator ? (navigator as any).deviceMemory : 0,
       });
     };
 
