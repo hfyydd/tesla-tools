@@ -25,6 +25,7 @@ export default function ClientInfo() {
     hardwareConcurrency: 0,
     deviceMemory: 0,
   });
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     const updateInfo = () => {
@@ -51,8 +52,28 @@ export default function ClientInfo() {
     updateInfo();
     window.addEventListener('resize', updateInfo);
 
-    return () => window.removeEventListener('resize', updateInfo);
+    const fullscreenChangeHandler = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', fullscreenChangeHandler);
+
+    return () => {
+      window.removeEventListener('resize', updateInfo);
+      document.removeEventListener('fullscreenchange', fullscreenChangeHandler);
+    };
   }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        console.error(`全屏请求失败: ${err.message}`);
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  };
 
   const InfoItem = ({ label, value }: { label: string; value: string | number | boolean }) => (
     <div className="bg-white rounded-md p-4">
@@ -63,7 +84,15 @@ export default function ClientInfo() {
 
   return (
     <div className="bg-gray-100 rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-semibold mb-4">浏览器和设备信息</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-semibold">浏览器和设备信息</h2>
+        <button
+          onClick={toggleFullscreen}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          {isFullscreen ? '退出全屏' : '全屏显示'}
+        </button>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <InfoItem label="屏幕分辨率" value={`${info.screenWidth} x ${info.screenHeight}`} />
         <InfoItem label="屏幕方向" value={info.orientation} />

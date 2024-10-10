@@ -5,8 +5,9 @@ export default function Home() {
   return (
     <div className="max-w-4xl mx-auto p-6 font-sans">
       <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">用户访问信息</h1>
-      <HeaderInfo />
       <ClientInfo />
+      <HeaderInfo />
+
     </div>
   );
 }
